@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аксессуары для мобильных устройств | Кыргызстан</title>
+    <!-- Подключаем Tailwind CSS для современного стильного и адаптивного дизайна -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Кастомный скроллбар для эстетики */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Шапка сайта -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="resetSearch()">
+                <div class="bg-blue-600 text-white font-bold p-2 rounded-xl text-lg flex items-center justify-center w-10 h-10 shadow-md shadow-blue-500/20">
+                    🇰🇬
+                </div>
+                <div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">MobileStore</span>
+                    <span class="text-xs block text-slate-400 -mt-1 font-medium">Кыргызстан</span>
+                </div>
+            </div>
+
+            <button onclick="openCart()" class="relative flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl transition duration-200 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span>Корзина</span>
+                <span id="cartCount" class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Главный контейнер -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Баннер поиска -->
+        <div class="mb-8">
+            <div class="relative max-w-xl mx-auto">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Поиск аксессуаров (чехлы, зарядки, стекла)..." 
+                    class="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 placeholder-slate-400 transition">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Скрытая панель администратора -->
+        <div id="adminPanel" class="hidden mb-10 bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-4 border-b border-amber-200/60 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="p-1.5 bg-amber-500 text-white rounded-lg">⚙️</span>
+                    <h2 class="text-lg font-bold text-amber-900">Панель администратора</h2>
+                </div>
+                <span class="text-xs bg-amber-200 text-amber-800 font-semibold px-2.5 py-1 rounded-full">Режим редактирования</span>
+            </div>
+            
+            <p class="text-xs text-amber-700 mb-4">Здесь вы можете легко управлять ценами и ассортиментом магазина. Все изменения сохраняются автоматически.</p>
+
+            <form onsubmit="addProduct(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="prodTitle" placeholder="Название товара" required 
+                    class="p-3 bg-white border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm">
+                <input type="number" id="prodPrice" placeholder="Цена (сом)" required 
+                    class="p-3 bg-white border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm">
+                <input type="url" id="prodImage" placeholder="Ссылка на фото (URL)" required 
+                    class="p-3 bg-white border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm">
+                <button type="submit" 
+                    class="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-sm shadow-md shadow-amber-600/20">
+                    + Добавить товар
+                </button>
+            </form>
+        </div>
+
+        <!-- Сетка товаров -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800">Каталог товаров</h2>
+            <span id="productCount" class="text-sm text-slate-500 font-medium">0 товаров</span>
+        </div>
+
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Товары будут загружаться динамически с помощью JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Подвал сайта -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
+            <p>© 2026 MobileStore.kg — Мобильные аксессуары с доставкой по Кыргызстану</p>
+        </div>
+    </footer>
+
+    <!-- Модальное окно корзины и онлайн оплаты -->
+    <div id="cartModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            
+            <!-- Заголовок модального окна -->
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span>🛒</span> Корзина и Оплата
+                </h3>
+                <button onclick="closeCart()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Контент модального окна -->
+            <div class="p-6 overflow-y-auto space-y-6">
+                
+                <!-- Список выбранных товаров -->
+                <div>
+                    <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Ваш заказ</h4>
+                    <div id="cartItems" class="space-y-3 max-h-40 overflow-y-auto pr-1">
+                        <!-- Динамические товары в корзине -->
+                    </div>
+                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-100 text-slate-800">
+                        <span class="font-medium">Итого к оплате:</span>
+                        <span id="cartTotal" class="text-2xl font-bold text-blue-600">0 сом</span>
+                    </div>
+                </div>
+
+                <!-- Блок оплаты по ELQR -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-5 text-center">
+                    <h4 class="font-bold text-slate-800 mb-1">Оплата через ELQR</h4>
+                    <p class="text-xs text-slate-500 mb-4">Отсканируйте QR-код в приложении любого банка Кыргызстана</p>
+                    
+                    <!-- Изображение QR кода -->
+                    <div class="bg-white p-3 rounded-2xl inline-block shadow-md border border-slate-100 mb-4">
+                        <img src="image.png" alt="ELQR Код оплаты" class="w-48 h-48 object-contain mx-auto" onerror="this.onerror=null; this.src='https://placehold.co/200x200/2563eb/ffffff?text=ELQR+Код';">
+                    </div>
+
+                    <!-- Реквизиты получателя -->
+                    <div class="bg-white/80 rounded-xl p-3 text-left border border-blue-100/50 text-xs space-y-1.5 text-slate-700">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Получатель:</span>
+                            <span class="font-semibold text-slate-900">Тураров А. М.</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Номер телефона:</span>
+                            <span class="font-semibold text-blue-600">+996 (701) 875-587</span>
+                        </div>
+                        <div class="flex justify-between pt-1 border-t border-slate-200/60 text-[11px] text-slate-500">
+                            <span>Поддерживает:</span>
+                            <span class="font-medium">MBank, O!Dengi, Bakai, Компаньон</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Форма оформления -->
+                <form onsubmit="submitOrder(event)" class="space-y-3">
+                    <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Данные для доставки</h4>
+                    <input type="text" placeholder="Ваше Имя" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="tel" placeholder="Номер WhatsApp (+996...)" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" placeholder="Адрес (г. Бишкек или регион)" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/20 transition duration-200 mt-2">
+                        Подтвердить заказ
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // 🔑 СЕКРЕТНЫЙ КОД АДМИНИСТРАТОРА
+        // Вы можете изменить значение переменной ниже на любой пароль
+        // =========================================================
+        const ADMIN_CODE = "admin123";
+
+        // Начальный набор товаров
+        const defaultProducts = [
+            { 
+                id: 1, 
+                title: "Защитное стекло iPhone 13 / 14 / 15", 
+                price: 250, 
+                image: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400" 
+            },
+            { 
+                id: 2, 
+                title: "Быстрое зарядное устройство Type-C 20W", 
+                price: 650, 
+                image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400" 
+            },
+            { 
+                id: 3, 
+                title: "Прозрачный силиконовый чехол MagSafe", 
+                price: 400, 
+                image: "https://images.unsplash.com/photo-1603313011101-320f26a4f6f6?w=400" 
+            },
+            { 
+                id: 4, 
+                title: "Кабель Type-C to Lightning (1м)", 
+                price: 350, 
+                image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400" 
+            }
+        ];
+
+        // Загрузка товаров из localStorage или использование дефолтных
+        let products = JSON.parse(localStorage.getItem('store_products')) || defaultProducts;
+        let cart = [];
+        let isAdmin = false;
+
+        // Сохранение списка товаров в память браузера
+        function saveProducts() {
+            localStorage.setItem('store_products', JSON.stringify(products));
+        }
+
+        // Поиск и проверка секретного кода доступа
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const adminPanel = document.getElementById('adminPanel');
+
+            if (query === ADMIN_CODE) {
+                isAdmin = true;
+                adminPanel.classList.remove('hidden');
+                renderProducts();
+                return;
+            }
+
+            renderProducts(query);
+        }
+
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            renderProducts();
+        }
+
+        // Отрисовка товаров в каталоге
+        function renderProducts(filter = '') {
+            const grid = document.getElementById('productGrid');
+            const countElem = document.getElementById('productCount');
+            grid.innerHTML = '';
+
+            const filtered = products.filter(p => p.title.toLowerCase().includes(filter.toLowerCase()));
+            countElem.innerText = `${filtered.length} товаров`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-400">
+                        <p class="text-lg">Товары не найдены</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(product => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="w-full h-48 bg-slate-50 rounded-xl overflow-hidden mb-4 flex items-center justify-center p-2">
+                                <img src="${product.image}" alt="${product.title}" class="max-h-full max-w-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/400x400/f1f5f9/94a3b8?text=Фото+аксессуара';">
+                            </div>
+                            <h3 class="font-semibold text-slate-800 text-sm mb-2 line-clamp-2">${product.title}</h3>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold text-blue-600 mb-3">${product.price} сом</div>
+                            <button onclick="addToCart(${product.id})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition duration-200 text-sm shadow-md shadow-blue-500/10 active:scale-[0.98]">
+                                В корзину
+                            </button>
+                            ${isAdmin ? `
+                                <button onclick="deleteProduct(${product.id})" class="w-full mt-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium py-1.5 rounded-lg text-xs transition">
+                                    Удалить товар
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Добавление товара (Админ)
+        function addProduct(e) {
+            e.preventDefault();
+            const title = document.getElementById('prodTitle').value;
+            const price = Number(document.getElementById('prodPrice').value);
+            const image = document.getElementById('prodImage').value;
+
+            const newProduct = {
+                id: Date.now(),
+                title,
+                price,
+                image
+            };
+
+            products.push(newProduct);
+            saveProducts();
+            renderProducts();
+
+            document.getElementById('prodTitle').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodImage').value = '';
+        }
+
+        // Удаление товара (Админ)
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            saveProducts();
+            renderProducts();
+        }
+
+        // Корзина
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            document.getElementById('cartCount').innerText = cart.length;
+        }
+
+        function openCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            cartItems.innerHTML = '';
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Корзина пуста</p>';
+            } else {
+                let total = 0;
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    cartItems.innerHTML += `
+                        <div class="flex justify-between items-center text-sm bg-slate-50 p-2.5 rounded-xl">
+                            <span class="text-slate-700 font-medium truncate pr-2">${item.title}</span>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <span class="font-bold text-slate-900">${item.price} сом</span>
+                                <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 font-bold ml-1">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                cartTotal.innerText = `${total} сом`;
+            }
+
+            document.getElementById('cartModal').classList.remove('hidden');
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            openCart();
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').classList.add('hidden');
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            if (cart.length === 0) {
+                alert('Пожалуйста, добавьте хотя бы один товар в корзину.');
+                return;
+            }
+            alert('Спасибо за ваш заказ! Мы свяжемся с вами в WhatsApp для подтверждения доставки.');
+            cart = [];
+            updateCartCount();
+            closeCart();
+        }
+
+        // Первичная инициализация при загрузке
+        renderProducts();
+    </script>
+</body>
+</html>
